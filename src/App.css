@@ -1,0 +1,230 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ============================================
+   Design System — Catppuccin-inspired palette
+   ============================================ */
+
+:root {
+  /* Typography */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+               "Helvetica Neue", Arial, "Noto Sans", sans-serif,
+               "Apple Color Emoji", "Segoe UI Emoji";
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Light theme (Catppuccin Latte-inspired) */
+  --bg-base: #eff1f5;
+  --bg-mantle: #e6e9ef;
+  --bg-crust: #dce0e8;
+  --bg-surface0: #ccd0da;
+  --bg-surface1: #bcc0cc;
+  --bg-surface2: #acb0be;
+  --border: #bcc0cc;
+  --border-subtle: #ccd0da;
+  --text-primary: #4c4f69;
+  --text-secondary: #6c6f85;
+  --text-muted: #9ca0b0;
+  --accent: #1e66f5;
+  --accent-hover: #7287fd;
+  --accent-surface: rgba(30, 102, 245, 0.08);
+  --link: #1e66f5;
+  --success: #40a02b;
+  --warning: #df8e1d;
+  --error: #d20f39;
+
+  color: var(--text-primary);
+  background-color: var(--bg-base);
+}
+
+.dark {
+  color-scheme: dark;
+
+  /* Dark theme (Catppuccin Mocha) */
+  --bg-base: #1e1e2e;
+  --bg-mantle: #181825;
+  --bg-crust: #11111b;
+  --bg-surface0: #313244;
+  --bg-surface1: #45475a;
+  --bg-surface2: #585b70;
+  --border: #45475a;
+  --border-subtle: #313244;
+  --text-primary: #cdd6f4;
+  --text-secondary: #a6adc8;
+  --text-muted: #6c7086;
+  --accent: #89b4fa;
+  --accent-hover: #b4befe;
+  --accent-surface: rgba(137, 180, 250, 0.1);
+  --link: #89b4fa;
+  --success: #a6e3a1;
+  --warning: #f9e2af;
+  --error: #f38ba8;
+
+  color: var(--text-primary);
+  background-color: var(--bg-base);
+}
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+/* ============================================
+   Smooth transitions for theme switching
+   ============================================ */
+body, #root {
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* ============================================
+   Custom scrollbars (WebKit)
+   ============================================ */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bg-surface1);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--bg-surface2);
+}
+
+/* ============================================
+   Selection highlight
+   ============================================ */
+::selection {
+  background: rgba(137, 180, 250, 0.25);
+}
+.dark ::selection {
+  background: rgba(137, 180, 250, 0.3);
+}
+
+/* ============================================
+   Markdown Preview Overrides
+   ============================================ */
+
+/* Dark mode: override github-markdown-css colors with Catppuccin */
+.dark .markdown-body {
+  --bgColor-default: #1e1e2e !important;
+  --bgColor-muted: #313244 !important;
+  --fgColor-default: #cdd6f4 !important;
+  --fgColor-muted: #a6adc8 !important;
+  --fgColor-accent: #89b4fa !important;
+  --borderColor-default: #45475a !important;
+  --borderColor-muted: #313244 !important;
+  --color-canvas-default: #1e1e2e !important;
+  --color-canvas-subtle: #313244 !important;
+  --color-border-default: #45475a !important;
+  --color-border-muted: #313244 !important;
+  --color-fg-default: #cdd6f4 !important;
+  --color-fg-muted: #a6adc8 !important;
+  --color-accent-fg: #89b4fa !important;
+  background-color: #1e1e2e !important;
+  color: #cdd6f4 !important;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+/* Light mode markdown body */
+.markdown-body {
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+/* Better heading styles */
+.markdown-body h1 {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  padding-bottom: 0.3em;
+}
+.markdown-body h2 {
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  padding-bottom: 0.25em;
+}
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  font-weight: 600;
+}
+
+/* Dark mode: blockquote */
+.dark .markdown-body blockquote {
+  border-left-color: var(--accent) !important;
+  color: var(--text-secondary) !important;
+  background: var(--bg-surface0);
+  border-radius: 0 6px 6px 0;
+  padding: 0.5em 1em;
+}
+
+/* Light mode: blockquote */
+.markdown-body blockquote {
+  border-radius: 0 6px 6px 0;
+  padding: 0.5em 1em;
+}
+
+/* Code block refinements */
+.dark .markdown-body pre {
+  background: #313244 !important;
+  border: 1px solid #45475a !important;
+  border-radius: 8px !important;
+}
+.markdown-body pre {
+  border-radius: 8px !important;
+}
+
+/* Inline code */
+.dark .markdown-body code:not(pre code) {
+  background: rgba(137, 180, 250, 0.12) !important;
+  color: #b4befe !important;
+  border: none !important;
+  border-radius: 4px;
+  padding: 0.15em 0.4em;
+  font-size: 0.88em;
+}
+
+/* Tables */
+.dark .markdown-body table tr {
+  background-color: transparent !important;
+  border-color: #45475a !important;
+}
+.dark .markdown-body table tr:nth-child(2n) {
+  background-color: rgba(49, 50, 68, 0.5) !important;
+}
+.dark .markdown-body table th {
+  background-color: #313244 !important;
+}
+
+/* Links */
+.dark .markdown-body a {
+  color: #89b4fa !important;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.dark .markdown-body a:hover {
+  color: #b4befe !important;
+}
+
+/* HR */
+.dark .markdown-body hr {
+  border-color: #45475a !important;
+}
+
+/* Images */
+.markdown-body img {
+  border-radius: 8px;
+}
