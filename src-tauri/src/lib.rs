@@ -1,5 +1,7 @@
 mod commands;
 
+use tauri::Emitter;
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -16,6 +18,18 @@ pub fn run() {
             commands::update_ops::check_for_update,
             commands::update_ops::download_and_install_update,
         ])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .build(tauri::generate_context!())
+        .expect("error while building tauri application")
+        .run(|app, event| {
+            if let tauri::RunEvent::Opened { urls } = event {
+                for url in urls {
+                    // Convert file:// URL to path
+                    if let Ok(path) = url.to_file_path() {
+                        if let Some(path_str) = path.to_str() {
+                            let _ = app.emit("open-file", path_str.to_string());
+                        }
+                    }
+                }
+            }
+        });
 }

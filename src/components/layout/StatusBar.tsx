@@ -13,7 +13,7 @@ interface UpdateInfo {
   download_url: string;
 }
 
-const APP_VERSION = '0.1.0';
+const APP_VERSION = '0.2.0';
 
 export default function StatusBar() {
   const locale = useAppStore((s) => s.locale);

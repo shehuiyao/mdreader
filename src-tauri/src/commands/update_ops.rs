@@ -1,6 +1,6 @@
 use tauri::Emitter;
 
-const APP_VERSION: &str = "0.1.0";
+const APP_VERSION: &str = "0.2.0";
 
 #[derive(serde::Serialize)]
 pub struct UpdateInfo {

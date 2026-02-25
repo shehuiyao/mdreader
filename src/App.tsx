@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { listen } from '@tauri-apps/api/event';
 import './App.css';
 import { useAppStore } from './stores/useAppStore';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
@@ -9,6 +10,7 @@ import MainContent from './components/layout/MainContent';
 import TOC from './components/preview/TOC';
 import StatusBar from './components/layout/StatusBar';
 import { loadSettings, saveSetting } from './hooks/useSettings';
+import { readFile } from './lib/tauri';
 
 function App() {
   const sidebarVisible = useAppStore((s) => s.sidebarVisible);
@@ -16,6 +18,8 @@ function App() {
   const theme = useAppStore((s) => s.theme);
   const previewFontSize = useAppStore((s) => s.previewFontSize);
   const setPreviewFontSize = useAppStore((s) => s.setPreviewFontSize);
+  const openFile = useAppStore((s) => s.openFile);
+  const addRecentFile = useAppStore((s) => s.addRecentFile);
   useKeyboardShortcuts();
   useFileWatcher();
 
@@ -39,6 +43,22 @@ function App() {
       return () => mq.removeEventListener('change', handler as (e: MediaQueryListEvent) => void);
     }
   }, [theme]);
+
+  // Listen for file open events from macOS (double-click .md files)
+  useEffect(() => {
+    const unlisten = listen<string>('open-file', async (event) => {
+      const path = event.payload;
+      const name = path.split('/').pop() ?? path;
+      try {
+        const content = await readFile(path);
+        openFile(path, name, content);
+        addRecentFile(path, name);
+      } catch (e) {
+        console.error('Failed to open file:', e);
+      }
+    });
+    return () => { void unlisten.then((fn) => fn()); };
+  }, [openFile, addRecentFile]);
 
   useEffect(() => {
     const initSettings = async () => {
