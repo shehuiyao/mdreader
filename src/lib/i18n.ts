@@ -46,6 +46,18 @@ const translations = {
     toggleTOC: '切换目录',
     theme: '主题',
     language: '语言',
+
+    // Update
+    checkForUpdates: '检查更新',
+    updateChecking: '检查中...',
+    updateCancel: '取消',
+    updateUpToDate: '已是最新版',
+    updateAvailable: '可用',
+    updateNow: '立即更新',
+    updateDownloading: '下载中...',
+    updateReady: '已就绪',
+    updateRestart: '立即重启',
+    updateFailed: '更新失败',
   },
   en: {
     // Header
@@ -92,6 +104,18 @@ const translations = {
     toggleTOC: 'Toggle Table of Contents',
     theme: 'Theme',
     language: 'Language',
+
+    // Update
+    checkForUpdates: 'Check for Updates',
+    updateChecking: 'Checking...',
+    updateCancel: 'Cancel',
+    updateUpToDate: 'Up to date',
+    updateAvailable: 'available',
+    updateNow: 'Update Now',
+    updateDownloading: 'Downloading...',
+    updateReady: 'Ready',
+    updateRestart: 'Restart Now',
+    updateFailed: 'Update failed',
   },
 } as const;
 

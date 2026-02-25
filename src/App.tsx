@@ -7,6 +7,7 @@ import Header from './components/layout/Header';
 import Sidebar from './components/layout/Sidebar';
 import MainContent from './components/layout/MainContent';
 import TOC from './components/preview/TOC';
+import StatusBar from './components/layout/StatusBar';
 import { loadSettings, saveSetting } from './hooks/useSettings';
 
 function App() {
@@ -61,6 +62,7 @@ function App() {
         <MainContent />
         {tocVisible && <TOC />}
       </div>
+      <StatusBar />
     </div>
   );
 }
