@@ -15,8 +15,6 @@ pub fn run() {
             commands::file_ops::read_file,
             commands::file_ops::write_file,
             commands::directory_ops::list_directory,
-            commands::update_ops::check_for_update,
-            commands::update_ops::download_and_install_update,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")

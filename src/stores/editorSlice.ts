@@ -20,7 +20,7 @@ export interface EditorSlice {
 }
 
 export const createEditorSlice: StateCreator<EditorSlice, [], [], EditorSlice> = (set) => ({
-  viewMode: 'split',
+  viewMode: 'preview',
   tocVisible: true,
   fontSize: 14,
   previewFontSize: 16,

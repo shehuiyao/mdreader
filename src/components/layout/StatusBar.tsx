@@ -1,26 +1,20 @@
 import { useState, useCallback, useRef } from 'react';
-import { invoke } from '@tauri-apps/api/core';
+import { check } from '@tauri-apps/plugin-updater';
 import { relaunch } from '@tauri-apps/plugin-process';
 import { useAppStore } from '../../stores/useAppStore';
 import { t } from '../../lib/i18n';
 
-type UpdateStatus = 'idle' | 'checking' | 'up-to-date' | 'update-available' | 'downloading' | 'done' | 'error';
+type UpdateStatus = 'idle' | 'checking' | 'up-to-date' | 'update-available' | 'downloading' | 'installing' | 'done' | 'error';
 
-interface UpdateInfo {
-  current_version: string;
-  latest_version: string;
-  update_available: boolean;
-  download_url: string;
-}
-
-const APP_VERSION = '0.2.0';
+const APP_VERSION = '0.3.0';
 
 export default function StatusBar() {
   const locale = useAppStore((s) => s.locale);
   const [updateStatus, setUpdateStatus] = useState<UpdateStatus>('idle');
   const [latestVersion, setLatestVersion] = useState('');
-  const [downloadUrl, setDownloadUrl] = useState('');
+  const [downloadProgress, setDownloadProgress] = useState(0);
   const [errorMsg, setErrorMsg] = useState('');
+  const updateRef = useRef<Awaited<ReturnType<typeof check>> | null>(null);
   const checkCancelledRef = useRef(false);
 
   const handleCancelCheck = useCallback(() => {
@@ -33,16 +27,16 @@ export default function StatusBar() {
     checkCancelledRef.current = false;
     setUpdateStatus('checking');
     try {
-      const info = await Promise.race([
-        invoke<UpdateInfo>('check_for_update'),
+      const update = await Promise.race([
+        check(),
         new Promise<never>((_, reject) =>
           setTimeout(() => reject(new Error('Update check timed out')), 15000)
         ),
       ]);
       if (checkCancelledRef.current) return;
-      if (info.update_available) {
-        setLatestVersion(info.latest_version);
-        setDownloadUrl(info.download_url);
+      if (update) {
+        updateRef.current = update;
+        setLatestVersion(update.version);
         setUpdateStatus('update-available');
       } else {
         setUpdateStatus('up-to-date');
@@ -59,10 +53,25 @@ export default function StatusBar() {
   }, [updateStatus]);
 
   const handleDownloadAndInstall = useCallback(async () => {
-    if (!downloadUrl) return;
+    const update = updateRef.current;
+    if (!update) return;
     try {
       setUpdateStatus('downloading');
-      await invoke('download_and_install_update', { url: downloadUrl });
+      setDownloadProgress(0);
+      let totalLength = 0;
+      let downloaded = 0;
+      await update.downloadAndInstall((event) => {
+        if (event.event === 'Started' && event.data.contentLength) {
+          totalLength = event.data.contentLength;
+        } else if (event.event === 'Progress') {
+          downloaded += event.data.chunkLength;
+          if (totalLength > 0) {
+            setDownloadProgress(Math.round((downloaded / totalLength) * 100));
+          }
+        } else if (event.event === 'Finished') {
+          setUpdateStatus('done');
+        }
+      });
       setUpdateStatus('done');
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
@@ -70,7 +79,7 @@ export default function StatusBar() {
       setErrorMsg(msg);
       setTimeout(() => setUpdateStatus('idle'), 5000);
     }
-  }, [downloadUrl]);
+  }, []);
 
   const handleRelaunch = useCallback(async () => {
     await relaunch();
@@ -109,7 +118,7 @@ export default function StatusBar() {
       case 'downloading':
         return (
           <span className="animate-pulse" style={{ color: 'var(--accent-cyan)' }}>
-            {t(locale, 'updateDownloading')}
+            {t(locale, 'updateDownloading')} {downloadProgress > 0 ? `${downloadProgress}%` : ''}
           </span>
         );
       case 'done':
