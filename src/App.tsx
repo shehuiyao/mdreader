@@ -66,6 +66,12 @@ function App() {
       if (typeof settings.previewFontSize === 'number') {
         setPreviewFontSize(settings.previewFontSize);
       }
+      const { setAIConfig } = useAppStore.getState();
+      setAIConfig({
+        baseUrl: settings.aiBaseUrl ?? '',
+        apiKey: settings.aiApiKey ?? '',
+        model: settings.aiModel ?? '',
+      });
     };
     void initSettings();
   }, [setPreviewFontSize]);

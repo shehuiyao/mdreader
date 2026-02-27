@@ -3,6 +3,9 @@ import { Store } from '@tauri-apps/plugin-store';
 // Settings structure
 export interface Settings {
   previewFontSize?: number;
+  aiBaseUrl?: string;
+  aiApiKey?: string;
+  aiModel?: string;
 }
 
 // Store instance (lazy-loaded)
@@ -26,8 +29,14 @@ export async function loadSettings(): Promise<Settings> {
   try {
     const storeInstance = await getStore();
     const previewFontSize = await storeInstance.get<number>('previewFontSize');
+    const aiBaseUrl = await storeInstance.get<string>('aiBaseUrl');
+    const aiApiKey = await storeInstance.get<string>('aiApiKey');
+    const aiModel = await storeInstance.get<string>('aiModel');
     return {
       previewFontSize: previewFontSize ?? 16, // default 16px
+      aiBaseUrl: aiBaseUrl ?? '',
+      aiApiKey: aiApiKey ?? '',
+      aiModel: aiModel ?? '',
     };
   } catch (error) {
     console.warn('Failed to load settings, using defaults:', error);

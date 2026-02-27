@@ -58,6 +58,25 @@ const translations = {
     updateReady: '已就绪',
     updateRestart: '立即重启',
     updateFailed: '更新失败',
+
+    // AI
+    aiSummary: 'AI 总结',
+    aiSettings: 'AI 设置',
+    aiBaseUrl: '接口地址',
+    aiApiKey: 'API 密钥',
+    aiModel: '模型',
+    aiTestConnection: '测试连接',
+    aiTestSuccess: '连接成功',
+    aiTestFailed: '连接失败',
+    aiSave: '保存',
+    aiCancel: '取消',
+    aiSummarizing: '正在总结...',
+    aiNoContent: '请先打开一个文档',
+    aiNotConfigured: '请先配置 AI 设置',
+    aiCollapse: '收起',
+    aiExpand: '展开',
+    aiClose: '关闭',
+    aiRetry: '重试',
   },
   en: {
     // Header
@@ -116,6 +135,25 @@ const translations = {
     updateReady: 'Ready',
     updateRestart: 'Restart Now',
     updateFailed: 'Update failed',
+
+    // AI
+    aiSummary: 'AI Summary',
+    aiSettings: 'AI Settings',
+    aiBaseUrl: 'Base URL',
+    aiApiKey: 'API Key',
+    aiModel: 'Model',
+    aiTestConnection: 'Test Connection',
+    aiTestSuccess: 'Connection Successful',
+    aiTestFailed: 'Connection Failed',
+    aiSave: 'Save',
+    aiCancel: 'Cancel',
+    aiSummarizing: 'Summarizing...',
+    aiNoContent: 'Please open a document first',
+    aiNotConfigured: 'Please configure AI settings first',
+    aiCollapse: 'Collapse',
+    aiExpand: 'Expand',
+    aiClose: 'Close',
+    aiRetry: 'Retry',
   },
 } as const;
 
