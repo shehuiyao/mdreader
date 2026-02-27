@@ -7,6 +7,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { useAppStore } from '../../stores/useAppStore';
+import AISummaryCard from '../ai/AISummaryCard';
 import 'github-markdown-css/github-markdown.css';
 
 // Catppuccin color tokens — keep in sync with App.css
@@ -36,6 +37,7 @@ export default function MarkdownPreview() {
       data-dark-theme="dark"
       data-light-theme="light"
     >
+      <AISummaryCard />
       <div
         className="markdown-body max-w-full p-8"
         style={{ backgroundColor: colors.bg, color: colors.text, fontSize: `${previewFontSize}px` }}
