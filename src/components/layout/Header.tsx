@@ -2,6 +2,7 @@ import { open } from '@tauri-apps/plugin-dialog';
 import { useAppStore } from '../../stores/useAppStore';
 import { readFile, writeFile, listDirectory } from '../../lib/tauri';
 import { t } from '../../lib/i18n';
+import { streamSummary } from '../../lib/ai';
 
 const noDrag = { WebkitAppRegion: 'no-drag' } as React.CSSProperties;
 
@@ -28,6 +29,7 @@ export default function Header() {
   const previewFontSize = useAppStore((s) => s.previewFontSize);
   const increasePreviewFontSize = useAppStore((s) => s.increasePreviewFontSize);
   const decreasePreviewFontSize = useAppStore((s) => s.decreasePreviewFontSize);
+  const aiLoading = useAppStore((s) => s.aiLoading);
 
   const handleOpenFile = async () => {
     const selected = await open({
@@ -70,6 +72,28 @@ export default function Header() {
     { value: 'split', labelKey: 'split' },
     { value: 'preview', labelKey: 'preview' },
   ];
+
+  const handleAISummary = async () => {
+    const state = useAppStore.getState();
+    if (!state.aiConfig.baseUrl || !state.aiConfig.apiKey || !state.aiConfig.model) {
+      state.setSettingsOpen(true);
+      return;
+    }
+    if (!content) return;
+    state.clearAISummary();
+    state.setAIVisible(true);
+    state.setAILoading(true);
+    await streamSummary(
+      state.aiConfig,
+      content,
+      (chunk) => useAppStore.getState().appendAISummary(chunk),
+      () => useAppStore.getState().setAILoading(false),
+      (error) => {
+        useAppStore.getState().setAIError(error);
+        useAppStore.getState().setAILoading(false);
+      },
+    );
+  };
 
   return (
     <div
@@ -117,6 +141,16 @@ export default function Header() {
 
       {/* Right section */}
       <div className="flex items-center gap-1" style={noDrag}>
+        {/* AI button */}
+        <button
+          onClick={handleAISummary}
+          disabled={!currentFilePath || aiLoading}
+          className="px-2 py-0.5 text-xs rounded hover:opacity-80 disabled:opacity-30 disabled:cursor-default mr-2 font-semibold"
+          style={{ color: 'var(--accent)' }}
+          title={t(locale, 'aiSummary')}
+        >
+          AI
+        </button>
         {/* View mode toggle */}
         <div className="flex items-center rounded-lg overflow-hidden mr-2" style={{ backgroundColor: 'var(--bg-surface0)' }}>
           {modes.map((m) => (
