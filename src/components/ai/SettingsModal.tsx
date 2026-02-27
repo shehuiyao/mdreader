@@ -16,6 +16,7 @@ export default function SettingsModal() {
   const [model, setModel] = useState(aiConfig.model);
   const [showKey, setShowKey] = useState(false);
   const [testStatus, setTestStatus] = useState<'idle' | 'loading' | 'success' | 'failed'>('idle');
+  const [testError, setTestError] = useState('');
 
   // Sync form fields when modal opens or aiConfig changes
   useEffect(() => {
@@ -45,9 +46,11 @@ export default function SettingsModal() {
   const handleTestConnection = async () => {
     if (!baseUrl || !apiKey) {
       setTestStatus('failed');
+      setTestError(t(locale, 'aiNotConfigured'));
       return;
     }
     setTestStatus('loading');
+    setTestError('');
     try {
       const res = await fetch(`${baseUrl}/models`, {
         method: 'GET',
@@ -57,9 +60,11 @@ export default function SettingsModal() {
         setTestStatus('success');
       } else {
         setTestStatus('failed');
+        setTestError(`${res.status} ${res.statusText}`);
       }
-    } catch {
+    } catch (e) {
       setTestStatus('failed');
+      setTestError(e instanceof Error ? e.message : String(e));
     }
   };
 
@@ -201,10 +206,12 @@ export default function SettingsModal() {
             <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>...</span>
           )}
           {testStatus === 'success' && (
-            <span style={{ color: '#a6e3a1', fontSize: 12 }}>{t(locale, 'aiTestSuccess')}</span>
+            <span style={{ color: 'var(--accent-green)', fontSize: 12 }}>{t(locale, 'aiTestSuccess')}</span>
           )}
           {testStatus === 'failed' && (
-            <span style={{ color: '#f38ba8', fontSize: 12 }}>{t(locale, 'aiTestFailed')}</span>
+            <span style={{ color: 'var(--accent-red)', fontSize: 12 }}>
+              {t(locale, 'aiTestFailed')}{testError ? `: ${testError}` : ''}
+            </span>
           )}
         </div>
 

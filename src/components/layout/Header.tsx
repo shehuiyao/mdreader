@@ -73,25 +73,38 @@ export default function Header() {
     { value: 'preview', labelKey: 'preview' },
   ];
 
+  const abortRef = { current: null as AbortController | null };
+
   const handleAISummary = async () => {
     const state = useAppStore.getState();
     if (!state.aiConfig.baseUrl || !state.aiConfig.apiKey || !state.aiConfig.model) {
       state.setSettingsOpen(true);
       return;
     }
-    if (!content) return;
+    if (!content) {
+      state.setAIError(t(locale, 'aiNoContent'));
+      state.setAIVisible(true);
+      return;
+    }
+    // 取消上一次未完成的请求
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     state.clearAISummary();
     state.setAIVisible(true);
     state.setAILoading(true);
     await streamSummary(
       state.aiConfig,
       content,
+      locale,
       (chunk) => useAppStore.getState().appendAISummary(chunk),
       () => useAppStore.getState().setAILoading(false),
       (error) => {
         useAppStore.getState().setAIError(error);
         useAppStore.getState().setAILoading(false);
       },
+      controller.signal,
     );
   };
 

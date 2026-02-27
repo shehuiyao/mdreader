@@ -11,29 +11,20 @@ export default function AISummaryCard() {
   const aiVisible = useAppStore((s) => s.aiVisible);
   const clearAISummary = useAppStore((s) => s.clearAISummary);
   const setAIVisible = useAppStore((s) => s.setAIVisible);
+  const setAILoading = useAppStore((s) => s.setAILoading);
   const locale = useAppStore((s) => s.locale);
-  const theme = useAppStore((s) => s.theme);
 
   const [collapsed, setCollapsed] = useState(false);
 
   if (!aiVisible) return null;
 
-  const isDark =
-    theme === 'dark' ||
-    (theme === 'system' &&
-      window.matchMedia('(prefers-color-scheme: dark)').matches);
-
-  const cardBg = isDark
-    ? 'rgba(88, 166, 255, 0.08)'
-    : 'rgba(9, 105, 218, 0.06)';
-  const cardBorder = isDark
-    ? 'rgba(88, 166, 255, 0.2)'
-    : 'rgba(9, 105, 218, 0.15)';
-
   return (
     <div
       className="mx-8 mt-4 mb-2 rounded-lg border"
-      style={{ backgroundColor: cardBg, borderColor: cardBorder }}
+      style={{
+        backgroundColor: 'var(--accent-surface)',
+        borderColor: 'var(--accent-border)',
+      }}
     >
       {/* Header bar */}
       <div className="flex items-center justify-between px-4 py-2">
@@ -42,7 +33,7 @@ export default function AISummaryCard() {
             className="text-sm font-medium"
             style={{ color: 'var(--text-primary)' }}
           >
-            ✨ {t(locale, 'aiSummary')}
+            {t(locale, 'aiSummary')}
           </span>
           {aiLoading && (
             <span
@@ -54,6 +45,17 @@ export default function AISummaryCard() {
           )}
         </div>
         <div className="flex items-center gap-2">
+          {aiLoading && (
+            <button
+              className="text-xs hover:opacity-80"
+              style={{ color: 'var(--accent-red)' }}
+              onClick={() => {
+                setAILoading(false);
+              }}
+            >
+              {t(locale, 'aiCancel')}
+            </button>
+          )}
           <button
             className="text-xs hover:opacity-80"
             style={{ color: 'var(--text-muted)' }}
@@ -69,7 +71,7 @@ export default function AISummaryCard() {
               clearAISummary();
             }}
           >
-            ✕
+            {t(locale, 'aiClose')}
           </button>
         </div>
       </div>
@@ -78,14 +80,31 @@ export default function AISummaryCard() {
       {!collapsed && (
         <div className="px-4 pb-3">
           {aiError ? (
-            <p className="text-sm" style={{ color: 'var(--accent-red)' }}>
-              {aiError}
-            </p>
+            <div className="flex items-center gap-2">
+              <p className="text-sm" style={{ color: 'var(--accent-red)' }}>
+                {aiError}
+              </p>
+              <button
+                className="text-xs px-2 py-0.5 rounded hover:opacity-80"
+                style={{
+                  color: 'var(--accent)',
+                  border: '1px solid var(--border-subtle)',
+                }}
+                onClick={() => {
+                  clearAISummary();
+                  setAIVisible(false);
+                  // 用户可通过再次点击 AI 按钮重试
+                }}
+              >
+                {t(locale, 'aiRetry')}
+              </button>
+            </div>
           ) : aiSummary ? (
             <div
               className="text-sm ai-summary-content"
               style={{ color: 'var(--text-secondary)' }}
             >
+              {/* 安全说明：此处故意不使用 rehypeRaw，防止 AI 输出的原始 HTML 被渲染 */}
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
                 {aiSummary}
               </ReactMarkdown>
