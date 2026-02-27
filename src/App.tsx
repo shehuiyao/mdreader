@@ -9,6 +9,7 @@ import Sidebar from './components/layout/Sidebar';
 import MainContent from './components/layout/MainContent';
 import TOC from './components/preview/TOC';
 import StatusBar from './components/layout/StatusBar';
+import SettingsModal from './components/ai/SettingsModal';
 import { loadSettings, saveSetting } from './hooks/useSettings';
 import { readFile } from './lib/tauri';
 
@@ -89,6 +90,7 @@ function App() {
         {tocVisible && <TOC />}
       </div>
       <StatusBar />
+      <SettingsModal />
     </div>
   );
 }

@@ -186,6 +186,14 @@ export default function Header() {
           </>
         )}
         <button
+          onClick={() => useAppStore.getState().setSettingsOpen(true)}
+          className="px-1.5 py-0.5 text-sm rounded hover:opacity-80"
+          style={{ color: 'var(--text-secondary)' }}
+          title={t(locale, 'aiSettings')}
+        >
+          &#9881;
+        </button>
+        <button
           onClick={toggleTheme}
           className="px-1.5 py-0.5 text-sm rounded hover:opacity-80"
           style={{ color: 'var(--text-secondary)' }}
