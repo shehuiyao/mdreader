@@ -17,6 +17,10 @@
     },
     {
       "identifier": "fs:allow-unwatch"
+    },
+    {
+      "identifier": "http:default",
+      "allow": [{ "url": "https://**" }]
     }
   ]
 }
