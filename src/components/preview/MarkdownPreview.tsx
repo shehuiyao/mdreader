@@ -37,7 +37,7 @@ export default function MarkdownPreview() {
       data-light-theme="light"
     >
       <div
-        className="markdown-body max-w-[800px] mx-auto p-8"
+        className="markdown-body max-w-full p-8"
         style={{ backgroundColor: colors.bg, color: colors.text, fontSize: `${previewFontSize}px` }}
       >
         <ReactMarkdown
