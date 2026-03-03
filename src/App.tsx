@@ -11,7 +11,7 @@ import TOC from './components/preview/TOC';
 import StatusBar from './components/layout/StatusBar';
 import SettingsModal from './components/ai/SettingsModal';
 import { loadSettings, saveSetting } from './hooks/useSettings';
-import { readFile } from './lib/tauri';
+import { readFile, getPendingFile } from './lib/tauri';
 
 function App() {
   const sidebarVisible = useAppStore((s) => s.sidebarVisible);
@@ -45,10 +45,9 @@ function App() {
     }
   }, [theme]);
 
-  // Listen for file open events from macOS (double-click .md files)
+  // Listen for file open events from macOS (double-click / right-click open .md files)
   useEffect(() => {
-    const unlisten = listen<string>('open-file', async (event) => {
-      const path = event.payload;
+    const handleFilePath = async (path: string) => {
       const name = path.split('/').pop() ?? path;
       try {
         const content = await readFile(path);
@@ -57,6 +56,16 @@ function App() {
       } catch (e) {
         console.error('Failed to open file:', e);
       }
+    };
+
+    // Check for file path that arrived before frontend was ready
+    getPendingFile().then((path) => {
+      if (path) void handleFilePath(path);
+    });
+
+    // Listen for subsequent open events (app already running)
+    const unlisten = listen<string>('open-file', (event) => {
+      void handleFilePath(event.payload);
     });
     return () => { void unlisten.then((fn) => fn()); };
   }, [openFile, addRecentFile]);
