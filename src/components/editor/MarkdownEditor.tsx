@@ -1,10 +1,11 @@
-import CodeMirror from '@uiw/react-codemirror';
+import CodeMirror, { type ReactCodeMirrorRef } from '@uiw/react-codemirror';
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown';
 import { languages } from '@codemirror/language-data';
 import { EditorView } from '@codemirror/view';
 import { oneDark } from '@codemirror/theme-one-dark';
+import { search, setSearchQuery, SearchQuery } from '@codemirror/search';
 import { useAppStore } from '../../stores/useAppStore';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useRef, useEffect } from 'react';
 
 /**
  * Catppuccin Mocha (dark) and Latte (light) color tokens — hardcoded here
@@ -47,6 +48,10 @@ export default function MarkdownEditor() {
   const setContent = useAppStore((s) => s.setContent);
   const fontSize = useAppStore((s) => s.fontSize);
   const theme = useAppStore((s) => s.theme);
+  const searchTerm = useAppStore((s) => s.searchTerm);
+  const searchVisible = useAppStore((s) => s.searchVisible);
+  const searchCurrentIndex = useAppStore((s) => s.searchCurrentIndex);
+  const cmRef = useRef<ReactCodeMirrorRef>(null);
 
   const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
@@ -122,10 +127,54 @@ export default function MarkdownEditor() {
         ),
       );
 
+      // Search extension (highlighting only, no panel)
+      exts.push(search({ top: false }));
+
       return exts;
     },
     [fontSize, isDark],
   );
+
+  // Sync search query to CodeMirror
+  useEffect(() => {
+    const view = cmRef.current?.view;
+    if (!view) return;
+
+    if (!searchVisible || !searchTerm) {
+      view.dispatch({ effects: setSearchQuery.of(new SearchQuery({ search: '' })) });
+      return;
+    }
+
+    view.dispatch({
+      effects: setSearchQuery.of(new SearchQuery({ search: searchTerm, caseSensitive: false })),
+    });
+  }, [searchTerm, searchVisible]);
+
+  // Navigate to current match in editor
+  useEffect(() => {
+    const view = cmRef.current?.view;
+    if (!view || !searchVisible || !searchTerm) return;
+
+    const text = view.state.doc.toString().toLowerCase();
+    const termLower = searchTerm.toLowerCase();
+    const positions: number[] = [];
+    let pos = 0;
+    while (true) {
+      const found = text.indexOf(termLower, pos);
+      if (found === -1) break;
+      positions.push(found);
+      pos = found + termLower.length;
+    }
+
+    if (positions.length > 0) {
+      const idx = Math.min(searchCurrentIndex, positions.length - 1);
+      const from = positions[idx];
+      view.dispatch({
+        selection: { anchor: from, head: from + searchTerm.length },
+        scrollIntoView: true,
+      });
+    }
+  }, [searchCurrentIndex, searchTerm, searchVisible]);
 
   const onChange = useCallback(
     (value: string) => {
@@ -137,6 +186,7 @@ export default function MarkdownEditor() {
   return (
     <div className="h-full w-full overflow-hidden">
       <CodeMirror
+        ref={cmRef}
         value={content}
         extensions={extensions}
         onChange={onChange}
@@ -148,6 +198,7 @@ export default function MarkdownEditor() {
           foldGutter: true,
           highlightActiveLine: true,
           bracketMatching: true,
+          searchKeymap: false,
         }}
       />
     </div>

@@ -1,4 +1,4 @@
-import { type JSX, useMemo } from 'react';
+import { type JSX, useMemo, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSlug from 'rehype-slug';
@@ -24,6 +24,10 @@ export default function MarkdownPreview() {
   const content = useAppStore((s) => s.content);
   const theme = useAppStore((s) => s.theme);
   const previewFontSize = useAppStore((s) => s.previewFontSize);
+  const searchTerm = useAppStore((s) => s.searchTerm);
+  const searchVisible = useAppStore((s) => s.searchVisible);
+  const searchCurrentIndex = useAppStore((s) => s.searchCurrentIndex);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
   const colors = isDark ? darkColors : lightColors;
@@ -37,9 +41,59 @@ export default function MarkdownPreview() {
     return { words, lines };
   }, [content]);
 
+  // Search highlighting via CSS Custom Highlight API
+  useEffect(() => {
+    const highlights = (CSS as any).highlights as Map<string, any> | undefined;
+    if (!highlights) return;
+
+    highlights.delete('search-result');
+    highlights.delete('search-current');
+
+    if (!searchVisible || !searchTerm || !containerRef.current) return;
+
+    const termLower = searchTerm.toLowerCase();
+    const ranges: Range[] = [];
+    const walker = document.createTreeWalker(containerRef.current, NodeFilter.SHOW_TEXT);
+
+    while (walker.nextNode()) {
+      const node = walker.currentNode;
+      const text = (node.textContent ?? '').toLowerCase();
+      let pos = 0;
+      while ((pos = text.indexOf(termLower, pos)) !== -1) {
+        const range = new Range();
+        range.setStart(node, pos);
+        range.setEnd(node, pos + searchTerm.length);
+        ranges.push(range);
+        pos += termLower.length;
+      }
+    }
+
+    if (ranges.length === 0) return;
+
+    // Highlight all matches
+    const HighlightClass = (window as any).Highlight;
+    if (!HighlightClass) return;
+
+    highlights.set('search-result', new HighlightClass(...ranges));
+
+    // Highlight current match
+    const idx = Math.min(searchCurrentIndex, ranges.length - 1);
+    highlights.set('search-current', new HighlightClass(ranges[idx]));
+
+    // Scroll current match into view
+    const rect = ranges[idx].getBoundingClientRect();
+    const container = containerRef.current;
+    const containerRect = container.getBoundingClientRect();
+    if (rect.top < containerRect.top || rect.bottom > containerRect.bottom) {
+      const scrollTop = container.scrollTop + rect.top - containerRect.top - containerRect.height / 3;
+      container.scrollTo({ top: scrollTop, behavior: 'smooth' });
+    }
+  }, [searchTerm, searchVisible, searchCurrentIndex, content]);
+
   return (
     <div className="h-full flex flex-col" style={{ backgroundColor: colors.bg }}>
       <div
+        ref={containerRef}
         id="preview-container"
         className="flex-1 overflow-y-auto"
         style={{ scrollBehavior: 'smooth' }}

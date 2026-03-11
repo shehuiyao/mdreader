@@ -3,6 +3,7 @@ import MarkdownEditor from '../editor/MarkdownEditor';
 import MarkdownPreview from '../preview/MarkdownPreview';
 import SplitPane from '../shared/SplitPane';
 import EmptyState from '../shared/EmptyState';
+import SearchBar from '../search/SearchBar';
 
 export default function MainContent() {
   const viewMode = useAppStore((s) => s.viewMode);
@@ -18,7 +19,8 @@ export default function MainContent() {
 
   if (viewMode === 'edit') {
     return (
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden relative">
+        <SearchBar />
         <MarkdownEditor />
       </div>
     );
@@ -26,7 +28,8 @@ export default function MainContent() {
 
   if (viewMode === 'preview') {
     return (
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden relative">
+        <SearchBar />
         <MarkdownPreview />
       </div>
     );
@@ -34,7 +37,8 @@ export default function MainContent() {
 
   // split mode
   return (
-    <div className="flex-1 overflow-hidden">
+    <div className="flex-1 overflow-hidden relative">
+      <SearchBar />
       <SplitPane left={<MarkdownEditor />} right={<MarkdownPreview />} />
     </div>
   );

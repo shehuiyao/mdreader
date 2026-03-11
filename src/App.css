@@ -240,3 +240,14 @@ body, #root {
 .markdown-body img {
   border-radius: 8px;
 }
+
+/* ============================================
+   Search highlights (CSS Custom Highlight API)
+   ============================================ */
+::highlight(search-result) {
+  background-color: rgba(255, 200, 0, 0.4);
+}
+::highlight(search-current) {
+  background-color: rgba(255, 150, 0, 0.7);
+  color: #000;
+}

@@ -6,6 +6,7 @@ export function useKeyboardShortcuts() {
   const { openFile, saveFile, saveAs, newFile } = useFileOperations();
   const toggleSidebar = useAppStore((s) => s.toggleSidebar);
   const toggleTOC = useAppStore((s) => s.toggleTOC);
+  const toggleSearch = useAppStore((s) => s.toggleSearch);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -38,10 +39,14 @@ export function useKeyboardShortcuts() {
             toggleTOC();
           }
           break;
+        case 'f':
+          e.preventDefault();
+          toggleSearch();
+          break;
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [openFile, saveFile, saveAs, newFile, toggleSidebar, toggleTOC]);
+  }, [openFile, saveFile, saveAs, newFile, toggleSidebar, toggleTOC, toggleSearch]);
 }
