@@ -8,7 +8,6 @@ export default function RecentFiles() {
   const recentFiles = useAppStore((s) => s.recentFiles);
   const setRecentFiles = useAppStore((s) => s.setRecentFiles);
   const openFileAction = useAppStore((s) => s.openFile);
-  const addRecentFile = useAppStore((s) => s.addRecentFile);
   const togglePinRecentFile = useAppStore((s) => s.togglePinRecentFile);
   const clearRecentFiles = useAppStore((s) => s.clearRecentFiles);
   const locale = useAppStore((s) => s.locale);
@@ -27,7 +26,6 @@ export default function RecentFiles() {
     try {
       const content = await readFile(path);
       openFileAction(path, name, content);
-      addRecentFile(path, name);
     } catch (err) {
       console.error('Failed to open file:', err);
     }

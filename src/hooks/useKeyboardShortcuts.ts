@@ -7,6 +7,8 @@ export function useKeyboardShortcuts() {
   const toggleSidebar = useAppStore((s) => s.toggleSidebar);
   const toggleTOC = useAppStore((s) => s.toggleTOC);
   const toggleSearch = useAppStore((s) => s.toggleSearch);
+  const switchToPrevFile = useAppStore((s) => s.switchToPrevFile);
+  const switchToNextFile = useAppStore((s) => s.switchToNextFile);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -43,10 +45,18 @@ export function useKeyboardShortcuts() {
           e.preventDefault();
           toggleSearch();
           break;
+        case '[':
+          e.preventDefault();
+          switchToPrevFile();
+          break;
+        case ']':
+          e.preventDefault();
+          switchToNextFile();
+          break;
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [openFile, saveFile, saveAs, newFile, toggleSidebar, toggleTOC, toggleSearch]);
+  }, [openFile, saveFile, saveAs, newFile, toggleSidebar, toggleTOC, toggleSearch, switchToPrevFile, switchToNextFile]);
 }
