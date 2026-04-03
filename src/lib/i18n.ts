@@ -35,6 +35,7 @@ const translations = {
     // File tree
     noFolderOpened: '尚未打开文件夹。',
     openFolderHint: '使用文件 > 文件夹来开始。',
+    openFolderButton: '打开文件夹',
     emptyFolder: '此文件夹为空。',
 
     // Empty state
@@ -114,6 +115,7 @@ const translations = {
     // File tree
     noFolderOpened: 'No folder opened.',
     openFolderHint: 'Use File > Folder to get started.',
+    openFolderButton: 'Open Folder',
     emptyFolder: 'This folder is empty.',
 
     // Empty state

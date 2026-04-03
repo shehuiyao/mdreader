@@ -6,6 +6,7 @@ export interface Settings {
   aiBaseUrl?: string;
   aiApiKey?: string;
   aiModel?: string;
+  lastRootFolderPath?: string | null;
 }
 
 // Store instance (lazy-loaded)
@@ -32,16 +33,19 @@ export async function loadSettings(): Promise<Settings> {
     const aiBaseUrl = await storeInstance.get<string>('aiBaseUrl');
     const aiApiKey = await storeInstance.get<string>('aiApiKey');
     const aiModel = await storeInstance.get<string>('aiModel');
+    const lastRootFolderPath = await storeInstance.get<string>('lastRootFolderPath');
     return {
       previewFontSize: previewFontSize ?? 16, // default 16px
       aiBaseUrl: aiBaseUrl ?? '',
       aiApiKey: aiApiKey ?? '',
       aiModel: aiModel ?? '',
+      lastRootFolderPath: lastRootFolderPath ?? null,
     };
   } catch (error) {
     console.warn('Failed to load settings, using defaults:', error);
     return {
       previewFontSize: 16,
+      lastRootFolderPath: null,
     };
   }
 }

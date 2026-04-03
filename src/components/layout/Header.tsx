@@ -3,6 +3,7 @@ import { useAppStore } from '../../stores/useAppStore';
 import { readFile, writeFile, listDirectory } from '../../lib/tauri';
 import { t } from '../../lib/i18n';
 import { streamSummary } from '../../lib/ai';
+import { saveSetting } from '../../hooks/useSettings';
 
 const noDrag = { WebkitAppRegion: 'no-drag' } as React.CSSProperties;
 
@@ -50,6 +51,7 @@ export default function Header() {
       const path = selected as string;
       const entries = await listDirectory(path);
       setRootFolder(path, entries);
+      await saveSetting('lastRootFolderPath', path);
       setSidebarTab('files');
       if (!sidebarVisible) toggleSidebar();
     }

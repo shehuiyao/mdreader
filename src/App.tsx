@@ -11,7 +11,7 @@ import TOC from './components/preview/TOC';
 import StatusBar from './components/layout/StatusBar';
 import SettingsModal from './components/ai/SettingsModal';
 import { loadSettings, saveSetting } from './hooks/useSettings';
-import { readFile, getPendingFile } from './lib/tauri';
+import { readFile, getPendingFile, listDirectory } from './lib/tauri';
 
 function App() {
   const sidebarVisible = useAppStore((s) => s.sidebarVisible);
@@ -76,12 +76,23 @@ function App() {
       if (typeof settings.previewFontSize === 'number') {
         setPreviewFontSize(settings.previewFontSize);
       }
-      const { setAIConfig } = useAppStore.getState();
+      const { setAIConfig, setRootFolder, setSidebarTab } = useAppStore.getState();
       setAIConfig({
         baseUrl: settings.aiBaseUrl ?? '',
         apiKey: settings.aiApiKey ?? '',
         model: settings.aiModel ?? '',
       });
+
+      if (settings.lastRootFolderPath) {
+        try {
+          const entries = await listDirectory(settings.lastRootFolderPath);
+          setRootFolder(settings.lastRootFolderPath, entries);
+          setSidebarTab('files');
+        } catch (error) {
+          console.warn('Failed to restore last root folder, clearing saved path:', error);
+          await saveSetting('lastRootFolderPath', null);
+        }
+      }
     };
     void initSettings();
   }, [setPreviewFontSize]);

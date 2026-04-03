@@ -6,7 +6,7 @@ import { t } from '../../lib/i18n';
 
 type UpdateStatus = 'idle' | 'checking' | 'up-to-date' | 'update-available' | 'downloading' | 'installing' | 'done' | 'error';
 
-const APP_VERSION = '0.3.5';
+const APP_VERSION = '0.3.6';
 
 export default function StatusBar() {
   const locale = useAppStore((s) => s.locale);
