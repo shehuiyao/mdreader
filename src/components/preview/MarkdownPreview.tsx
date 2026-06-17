@@ -1,8 +1,9 @@
-import { type JSX, useMemo, useRef, useEffect } from 'react';
+import { type JSX, type MouseEvent, useMemo, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSlug from 'rehype-slug';
 import rehypeRaw from 'rehype-raw';
+import { openUrl } from '@tauri-apps/plugin-opener';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
@@ -19,6 +20,17 @@ const lightColors = {
   bg: '#eff1f5',
   text: '#4c4f69',
 };
+
+const externalUrlPattern = /^(https?:|mailto:)/i;
+
+function handleMarkdownLinkClick(event: MouseEvent<HTMLAnchorElement>, href?: string) {
+  if (!href || !externalUrlPattern.test(href)) return;
+
+  event.preventDefault();
+  void openUrl(href).catch((error) => {
+    console.error('Failed to open external link:', error);
+  });
+}
 
 export default function MarkdownPreview() {
   const content = useAppStore((s) => s.content);
@@ -133,6 +145,21 @@ export default function MarkdownPreview() {
                   <code className={className} {...rest}>
                     {children}
                   </code>
+                );
+              },
+              a(props): JSX.Element {
+                const { children, href, node, ...rest } = props;
+                const isExternal = Boolean(href && externalUrlPattern.test(href));
+
+                return (
+                  <a
+                    href={href}
+                    onClick={(event) => handleMarkdownLinkClick(event, href)}
+                    rel={isExternal ? 'noreferrer' : undefined}
+                    {...rest}
+                  >
+                    {children}
+                  </a>
                 );
               },
             }}
